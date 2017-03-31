@@ -186,14 +186,11 @@ class LandlordController extends Controller
 		$this->view->content = $this->_view
 								->getPartial('landlords');
 	
-		// Add some local CSS resources
-        $this->assets
+		$this->assets
+            ->addCss('vendors/datatables/jquery.dataTables.css')
             ->addCss('vendors/datatables/dataTables.bootstrap.css');
-
-        // And some local JavaScript resources
         $this->assets
-            ->addJs('vendors/datatables/jquery.dataTables.min.js')
-            ->addJs('vendors/datatables/dataTables.bootstrap.min.js');
+             ->addJs('vendors/datatables/jquery.dataTables.min.js');
 
 		
 		$custom_js = $this->_view->getPartial('partials/landlords_javascript');
@@ -203,6 +200,91 @@ class LandlordController extends Controller
 
 	public function viewlandlordsAction()
 	{
+		$landlords = Landlord::find();
+		// $landlord_contacts = Contact::find();
+		// echo "<pre>";print_r($landlord_contacts);die;
+
+		$landlords_data = array();
+		// $landlord_phone = "";
+		$landlord_email = "";
+		$status = "";
+		$action = "";
+
+		// $landlord_contacts = Contact::findfirst("id = {$value->id}");
+		$landlord_contacts = Contact::find();
+		// echo "<pre>";print_r($landlord_contacts);die;
+		foreach ($landlord_contacts as $k => $v) 
+		{
+			// $landlord_contacts = Contact::find();
+			echo "<pre>";print_r($landlord_contacts);
+
+			if($v->type == 'phone')
+			{
+				$landlord_phone = $landlord_contacts->contact;
+			}
+			elseif ($v->type == 'email')
+			{
+				$landlord_email = $landlord_contacts->contact;
+			}
+			else
+			{
+				$landlord_contact = "Not provided";
+			}
+		}die;
+
+
+		foreach ($landlords as $key => $value) 
+		{
+
+			// $url = $this->url->get("superadmin/house/edit/$value->id");
+			// $url_ = $this->url->get("superadmin/house/delete/$value->id");
+			// $_url = $this->url->get("superadmin/house/assign/$value->id");
+			
+			
+
+			if ($value->type == 0)
+			{
+				$house_type = "Apartment";
+			}
+			else
+			{
+				$house_type = "Massionette/Bungalow";
+			}
+
+			if ($value->type == 0)
+			{
+				$house_type = "Apartment";
+			}
+			else
+			{
+				$house_type = "Massionette/Bungalow";
+			}
+
+			if ($value->available == 0)
+			{
+				$status = "<label class='label label-pill label-warning'>Empty</label>";
+				$action = "<a href = ''><i class='zmdi zmdi-edit'></i> | <a href = '{$_url}'><i class='zmdi zmdi-account-add'></i></a>";
+			}
+			else
+			{
+				$status = "<label class='label label-pill label-success'>Occupied</label>";
+				$action = "<a href = ''><i class='zmdi zmdi-edit'></i> | <a data-href = '' ><i class='zmdi zmdi-view-list'></i></a>";
+			}
+
+			//creating the table
+			$landlords_data[] = [
+				"<input type = 'checkbox' class='checkbox' name='houseid[]' value='$value->id'><i class='input-helper'></i>",
+				$value->first_name . " " . $value->surname,
+				$landlord_phone,
+				$landlord_email,
+				$value->house_no,
+				$value->rent_amount,
+				$status,
+				$action
+				];
+		}
+
+		echo json_encode($landlords_data);die;
 		
 	}
 }
